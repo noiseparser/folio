@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { summarizePortfolioHealth } from "./lib/portfolio-health.mjs";
+import { prioritizeFollowUps } from "./lib/follow-up-priority.mjs";
 
 type Account = {
   name: string;
@@ -125,7 +126,7 @@ export default function Home() {
                 <div className="card tasks-card">
                   <CardHeader title="Follow-ups" subtitle="4 items need attention" action="View tasks" />
                   <div className="task-list">
-                    {tasks.map((task) => <label className={task.done ? "task done" : "task"} key={task.id}><input type="checkbox" checked={task.done} onChange={() => toggleTask(task.id)} /><span><strong>{task.label}</strong><small>{task.meta}</small></span></label>)}
+                    {prioritizeFollowUps(tasks).map((task) => <label className={task.done ? "task done" : "task"} key={task.id}><input type="checkbox" checked={task.done} onChange={() => toggleTask(task.id)} /><span><strong>{task.label}</strong><small>{task.meta}</small></span></label>)}
                   </div>
                 </div>
 
@@ -142,7 +143,7 @@ export default function Home() {
 
           {section === "Pipeline" && <section className="board">{["Qualified", "Discovery", "Proposal", "Negotiation"].map((stage) => <div className="board-column" key={stage}><div className="board-title"><span>{stage}</span><b>{accounts.filter((account) => account.stage === stage).length}</b></div>{accounts.filter((account) => account.stage === stage).map((account) => <button className="deal-card" onClick={() => setSelected(account)} key={account.name}><span className={`health-pill ${account.health.toLowerCase().replace(" ", "-")}`}>{account.health}</span><strong>{account.name}</strong><small>{account.contact}</small><footer><b>{money(account.value)}</b><span>{account.owner}</span></footer></button>)}</div>)}</section>}
 
-          {section === "Tasks" && <section className="card full-tasks"><CardHeader title="All follow-ups" subtitle={`${tasks.filter((task) => !task.done).length} remaining`} action="＋ New task" /><div className="task-list">{tasks.map((task) => <label className={task.done ? "task done" : "task"} key={task.id}><input type="checkbox" checked={task.done} onChange={() => toggleTask(task.id)} /><span><strong>{task.label}</strong><small>{task.meta}</small></span></label>)}</div></section>}
+          {section === "Tasks" && <section className="card full-tasks"><CardHeader title="All follow-ups" subtitle={`${tasks.filter((task) => !task.done).length} remaining`} action="＋ New task" /><div className="task-list">{prioritizeFollowUps(tasks).map((task) => <label className={task.done ? "task done" : "task"} key={task.id}><input type="checkbox" checked={task.done} onChange={() => toggleTask(task.id)} /><span><strong>{task.label}</strong><small>{task.meta}</small></span></label>)}</div></section>}
         </div>
       </main>
 
