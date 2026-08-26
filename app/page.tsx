@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { summarizePortfolioHealth } from "./lib/portfolio-health.mjs";
 
 type Account = {
   name: string;
@@ -43,6 +44,7 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [tasks, setTasks] = useState(initialTasks);
   const [selected, setSelected] = useState<Account | null>(null);
+  const portfolioHealth = useMemo(() => summarizePortfolioHealth(accounts), []);
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -101,7 +103,7 @@ export default function Home() {
                 <Metric label="Active accounts" value="24" delta="+3 this month" trend="up" />
                 <Metric label="Open pipeline" value="$486k" delta="12 active deals" trend="neutral" />
                 <Metric label="Follow-ups due" value="7" delta="3 due today" trend="warn" />
-                <Metric label="Portfolio health" value="91%" delta="+4% from July" trend="up" />
+                <Metric label="Portfolio health" value={`${portfolioHealth.score}%`} delta={`${portfolioHealth.onTrack} accounts on track`} trend="up" />
               </section>
 
               <section className="dashboard-grid">
@@ -129,7 +131,7 @@ export default function Home() {
 
                 <div className="card health-card">
                   <CardHeader title="Account health" subtitle="Based on activity and momentum" action="View accounts" />
-                  <div className="health-summary"><div className="health-ring"><span>91<small>%</small></span></div><div><strong>Portfolio is healthy</strong><p>21 of 24 accounts are on track</p></div></div>
+                  <div className="health-summary"><div className="health-ring"><span>{portfolioHealth.score}<small>%</small></span></div><div><strong>Portfolio is healthy</strong><p>{portfolioHealth.onTrack} of {portfolioHealth.total} accounts are on track</p></div></div>
                   <div className="health-rows"><span><i className="dot green" />Strong <b>17</b></span><span><i className="dot amber" />Watch <b>4</b></span><span><i className="dot red" />At risk <b>3</b></span></div>
                 </div>
               </section>
